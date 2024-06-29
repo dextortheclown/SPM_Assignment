@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Building Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>City Building Game</h1>
+    </header>
+    <div class="container" id="main-menu">
+        <h2>Main Menu</h2>
+        <div class="menu-button" onclick="startNewArcadeGame()">Start New Arcade Game</div>
+        <div class="menu-button" onclick="startNewFreePlayGame()">Start New Free Play Game</div>
+        <div class="menu-button" onclick="loadSavedGame()">Load Saved Game</div>
+        <div class="menu-button" onclick="displayHighScores()">Display High Scores</div>
+        <div class="menu-button" onclick="exitToMainMenu()">Exit Game</div>
+    </div>
+
+    <div class="container" id="game-container" style="display: none;">
+        <h2 id="game-mode">Arcade Mode</h2>
+        <div>
+            <p>Turn: <span id="turn-number">1</span></p>
+            <p>Coins Left: <span id="coins-left">16</span></p>
+            <p>Current Score: <span id="current-score">0</span></p>
+            <p id="profit-display" style="display: none;">Current Profit: <span id="current-profit">0</span></p>
+            <p id="upkeep-display" style="display: none;">Current Upkeep: <span id="current-upkeep">0</span></p>
+        </div>
+        <div class="game-board" id="game-board">
+            <!-- Game board cells will be generated here -->
+        </div>
+        <div>
+            <div class="menu-button" onclick="buildBuilding()">Build a Building</div>
+            <div class="menu-button" onclick="demolishBuilding()">Demolish a Building</div>
+            <div class="menu-button" onclick="saveGame()">Save Game</div>
+            <div class="menu-button" onclick="exitToMainMenu()">Exit to Main Menu</div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="building-choice-container">
+        <h2>Choose a Building</h2>
+        <div class="menu-button" id="building-choice-1"></div>
+        <div class="menu-button" id="building-choice-2"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
