@@ -88,7 +88,7 @@ function buildBuilding() {
         alert('No more coins left!');
         return;
     }
-    const buildings = ['R', 'I', 'C', 'O', 'road'];
+    const buildings = ['Residential', 'Factory', 'Commercial', 'Park', 'Road'];
     building1 = buildings[Math.floor(Math.random() * buildings.length)];
     building2 = buildings[Math.floor(Math.random() * buildings.length)];
 
@@ -104,147 +104,42 @@ document.getElementById('building-choice-2').addEventListener('click', () => sel
 function selectBuilding(choice) {
     const building = choice == 1 ? building1 : building2;
     if (selectedCell) {
-        selectedCell.classList.add(building);
-        selectedCell.textContent = building;
-        coinsLeft--;
+        let imageSrc = `assets/${building}.jpg`;
+        selectedCell.innerHTML = `<img src="${imageSrc}" alt="${building}">`;
+        selectedCell.classList.remove('selected');
+        selectedCell = null;
         turnNumber++;
+        coinsLeft--;
+        currentScore += 10; // Example scoring
         if (gameMode === 'freeplay') {
-            updateFreePlayGameState(building);
+            if (building === 'Factory') {
+                currentProfit += 5; // Example profit
+                currentUpkeep += 3; // Example upkeep
+            }
         }
         updateGameInfo();
-        checkBoardExpansion(parseInt(selectedCell.dataset.row), parseInt(selectedCell.dataset.col));
         document.getElementById('building-choice-container').classList.add('hidden');
-    } else {
-        alert('No cell selected!');
     }
 }
 
-function updateFreePlayGameState(building) {
-    switch (building) {
-        case 'R':
-            currentProfit += 1;
-            break;
-        case 'I':
-            currentProfit += 2;
-            currentUpkeep += 1;
-            break;
-        case 'C':
-            currentProfit += 3;
-            currentUpkeep += 2;
-            break;
-        case 'O':
-            currentUpkeep += 1;
-            break;
-        case 'road':
-            // No profit or upkeep change for roads in this simple version
-            break;
-    }
-}
-
-function checkBoardExpansion(row, col) {
-    if (row == 0 || col == 0 || row == boardSize - 1 || col == boardSize - 1) {
-        boardSize += 5;
-        initGameBoard(boardSize);
-    }
-}
-
+// Placeholder functions for other menu options
 function demolishBuilding() {
-    if (selectedCell && selectedCell.textContent) {
-        const building = selectedCell.textContent;
-        selectedCell.className = 'cell';
-        selectedCell.textContent = '';
-        coinsLeft--;
-        turnNumber++;
-        if (gameMode === 'freeplay') {
-            updateFreePlayGameStateAfterDemolition(building);
-        }
-        updateGameInfo();
-    } else {
-        alert('No building to demolish or no cell selected!');
-    }
-}
-
-function updateFreePlayGameStateAfterDemolition(building) {
-    switch (building) {
-        case 'R':
-            currentProfit -= 1;
-            break;
-        case 'I':
-            currentProfit -= 2;
-            currentUpkeep -= 1;
-            break;
-        case 'C':
-            currentProfit -= 3;
-            currentUpkeep -= 2;
-            break;
-        case 'O':
-            currentUpkeep -= 1;
-            break;
-        case 'road':
-            // No profit or upkeep change for roads in this simple version
-            break;
-    }
+    alert('Demolish Building option selected');
 }
 
 function saveGame() {
-    const gameState = {
-        gameMode,
-        turnNumber,
-        coinsLeft,
-        currentScore,
-        currentProfit,
-        currentUpkeep,
-        boardSize,
-        cells: Array.from(gameBoard.children).map(cell => ({
-            row: cell.dataset.row,
-            col: cell.dataset.col,
-            class: cell.className,
-            text: cell.textContent
-        }))
-    };
-    localStorage.setItem('cityBuildingGameState', JSON.stringify(gameState));
-    alert('Game saved!');
+    alert('Save Game option selected');
 }
 
 function loadSavedGame() {
-    const savedState = localStorage.getItem('cityBuildingGameState');
-    if (savedState) {
-        const gameState = JSON.parse(savedState);
-        gameMode = gameState.gameMode;
-        turnNumber = gameState.turnNumber;
-        coinsLeft = gameState.coinsLeft;
-        currentScore = gameState.currentScore;
-        currentProfit = gameState.currentProfit;
-        currentUpkeep = gameState.currentUpkeep;
-        boardSize = gameState.boardSize;
-        document.getElementById('main-menu').style.display = 'none';
-        document.getElementById('game-container').style.display = 'block';
-        if (gameMode === 'freeplay') {
-            document.getElementById('profit-display').style.display = 'block';
-            document.getElementById('upkeep-display').style.display = 'block';
-        }
-        updateGameInfo();
-        initGameBoard(boardSize);
-        gameState.cells.forEach(cell => {
-            const boardCell = document.querySelector(`.cell[data-row="${cell.row}"][data-col="${cell.col}"]`);
-            boardCell.className = cell.class;
-            boardCell.textContent = cell.text;
-        });
-    } else {
-        alert('No saved game found.');
-    }
+    alert('Load Saved Game option selected');
 }
 
 function displayHighScores() {
-    alert('High scores not implemented yet.');
+    alert('Display High Scores option selected');
 }
 
 function exitToMainMenu() {
-    document.getElementById('main-menu').style.display = 'block';
     document.getElementById('game-container').style.display = 'none';
-    document.getElementById('profit-display').style.display = 'none';
-    document.getElementById('upkeep-display').style.display = 'none';
+    document.getElementById('main-menu').style.display = 'block';
 }
-
-document.querySelector('.menu-button:nth-child(3)').addEventListener('click', loadSavedGame);
-document.querySelector('.menu-button:nth-child(4)').addEventListener('click', displayHighScores);

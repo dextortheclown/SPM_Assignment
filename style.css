@@ -41,18 +41,16 @@ header {
     border: 1px solid #aaa;
     cursor: pointer;
 }
-.R { background-color: #ff9999; }
-.I { background-color: #9999ff; }
-.C { background-color: #ffff99; }
-.O { background-color: #99ff99; }
-.road { background-color: #cccccc; }
+.cell img {
+    width: 100%;
+    height: 100%;
+}
 .selected {
     outline: 2px solid red;
 }
 .hidden {
     display: none;
 }
-
 #building-choice-container {
     position: fixed;
     top: 50%;
@@ -64,7 +62,6 @@ header {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
-
 #building-choice-container .menu-button {
     display: block;
     margin: 10px auto;
