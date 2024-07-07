@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>City Building Game</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+        (function() {
+            emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS user ID
+        })();
+    </script>
 </head>
 <body>
     <header>
@@ -43,6 +50,26 @@
         <h2>Choose a Building</h2>
         <div class="menu-button" id="building-choice-1"></div>
         <div class="menu-button" id="building-choice-2"></div>
+    </div>
+
+    <!-- Dark Mode Toggle Button -->
+    <button id="dark-mode-toggle" class="dark-mode-toggle">
+        <i class="fas fa-moon"></i><i class="fas fa-sun"></i>
+    </button>
+
+    <!-- Feedback Button -->
+    <button id="feedback-button" class="feedback-button">Feedback</button>
+
+    <!-- Feedback Form Popup -->
+    <div id="feedback-popup" class="feedback-popup hidden">
+        <div class="feedback-popup-content">
+            <span id="feedback-close" class="feedback-close">&times;</span>
+            <h2>Feedback</h2>
+            <form id="feedback-form">
+                <textarea id="feedback-text" rows="4" cols="50" placeholder="Enter your feedback here..."></textarea><br>
+                <button type="submit" class="menu-button">Submit Feedback</button>
+            </form>
+        </div>
     </div>
 
     <script src="script.js"></script>

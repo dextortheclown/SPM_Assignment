@@ -143,3 +143,46 @@ function exitToMainMenu() {
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('main-menu').style.display = 'block';
 }
+
+// Add a button to toggle dark mode
+const darkModeToggle = document.createElement('button');
+darkModeToggle.id = 'dark-mode-toggle';
+darkModeToggle.innerHTML = '<i class="fas fa-moon"></i><i class="fas fa-sun"></i>';
+document.body.appendChild(darkModeToggle);
+
+darkModeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+});
+
+// Handle feedback form popup
+const feedbackButton = document.getElementById('feedback-button');
+const feedbackPopup = document.getElementById('feedback-popup');
+const feedbackClose = document.getElementById('feedback-close');
+
+feedbackButton.addEventListener('click', () => {
+    feedbackPopup.classList.toggle('hidden');
+});
+
+feedbackClose.addEventListener('click', () => {
+    feedbackPopup.classList.add('hidden');
+});
+
+// Handle feedback form submission
+document.getElementById('feedback-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const feedbackText = document.getElementById('feedback-text').value;
+
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+        feedback: feedbackText
+    })
+    .then(response => {
+        console.log('Feedback sent successfully:', response.status, response.text);
+        alert('Thank you for your feedback!');
+        document.getElementById('feedback-form').reset();
+        feedbackPopup.classList.add('hidden');
+    })
+    .catch(error => {
+        console.error('Error sending feedback:', error);
+        alert('There was an error submitting your feedback. Please try again later.');
+    });
+});
