@@ -23,6 +23,7 @@ function initGameBoard(size) {
             cell.classList.add('cell');
             cell.dataset.row = i;
             cell.dataset.col = j;
+            cell.dataset.building = ''; // Track the building type in the cell
             cell.addEventListener('click', () => selectCell(i, j));
             gameBoard.appendChild(cell);
         }
@@ -72,23 +73,26 @@ function updateGameInfo() {
     }
 }
 
-// Handle cell selection for building
+// Handle cell selection for building or removing
 function selectCell(row, col) {
     if (selectedCell) {
         selectedCell.classList.remove('selected');
     }
     selectedCell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
     selectedCell.classList.add('selected');
-    buildBuilding();
 }
 
-// Randomly select two buildings and allow player to build one
+// Build a building
 function buildBuilding() {
+    if (!selectedCell) {
+        alert('Please select a cell first.');
+        return;
+    }
     if (coinsLeft <= 0) {
         alert('No more coins left!');
         return;
     }
-    const buildings = ['Residential', 'Factory', 'Commercial', 'Park', 'Road'];
+    const buildings = ['Residential', 'Industry', 'Commercial', 'Park', 'Road'];
     building1 = buildings[Math.floor(Math.random() * buildings.length)];
     building2 = buildings[Math.floor(Math.random() * buildings.length)];
 
@@ -101,32 +105,176 @@ function buildBuilding() {
 document.getElementById('building-choice-1').addEventListener('click', () => selectBuilding(1));
 document.getElementById('building-choice-2').addEventListener('click', () => selectBuilding(2));
 
+document.getElementById('building-choice-1').addEventListener('click', () => selectBuilding(1));
+document.getElementById('building-choice-2').addEventListener('click', () => selectBuilding(2));
+
 function selectBuilding(choice) {
-    const building = choice == 1 ? building1 : building2;
+    const building = choice === 1 ? building1 : building2;
     if (selectedCell) {
         let imageSrc = `assets/${building}.jpg`;
+        const row = parseInt(selectedCell.dataset.row);
+        const col = parseInt(selectedCell.dataset.col);
+
         selectedCell.innerHTML = `<img src="${imageSrc}" alt="${building}">`;
+        selectedCell.dataset.building = building; // Track the building type in the cell
         selectedCell.classList.remove('selected');
         selectedCell = null;
         turnNumber++;
         coinsLeft--;
-        currentScore += 10; // Example scoring
+        currentScore += calculateScore(row, col, building);
         if (gameMode === 'freeplay') {
-            if (building === 'Factory') {
-                currentProfit += 5; // Example profit
-                currentUpkeep += 3; // Example upkeep
+            updateProfitAndUpkeep(building);
+            if (isOnBorder(row, col)) {
+                expandBoard();
             }
         }
         updateGameInfo();
-        document.getElementById('building-choice-container').classList.add('hidden');
+        document.getElementById('building-choice-container').classList.add('hidden'); // Hide the popup
+    }
+}
+
+function isOnBorder(row, col) {
+    return row == 0 || row == boardSize - 1 || col == 0 || col == boardSize - 1;
+}
+
+function expandBoard() {
+    boardSize += 5;
+    initGameBoard(boardSize);
+}
+
+function calculateScore(row, col, building) {
+    let score = 0;
+
+    // Define the scoring rules for each building type
+    if (building === 'Residential') {
+        score = calculateAdjacentScore(row, col, ['Residential', 'Commercial'], 1) + calculateAdjacentScore(row, col, ['Park'], 2);
+        if (hasAdjacentBuilding(row, col, 'Industry')) {
+            score = 1;
+        }
+    } else if (building === 'Industry') {
+        score = 1;
+    } else if (building === 'Commercial') {
+        score = calculateAdjacentScore(row, col, ['Commercial'], 1);
+    } else if (building === 'Park') {
+        score = calculateAdjacentScore(row, col, ['Park'], 1);
+    } else if (building === 'Road') {
+        score = calculateConnectedRoadScore(row, col);
+    }
+
+    return score;
+}
+
+function calculateAdjacentScore(row, col, buildingTypes, points) {
+    let score = 0;
+    const adjacentCells = getAdjacentCells(row, col);
+    adjacentCells.forEach(cell => {
+        if (buildingTypes.includes(cell.dataset.building)) {
+            score += points;
+        }
+    });
+    return score;
+}
+
+function getAdjacentCells(row, col) {
+    const adjacentCells = [];
+    const directions = [
+        { r: -1, c: 0 }, // Up
+        { r: 1, c: 0 },  // Down
+        { r: 0, c: -1 }, // Left
+        { r: 0, c: 1 }   // Right
+    ];
+
+    directions.forEach(direction => {
+        const r = row + direction.r;
+        const c = col + direction.c;
+        if (r >= 0 && r < boardSize && c >= 0 && c < boardSize) {
+            const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+            if (cell) {
+                adjacentCells.push(cell);
+            }
+        }
+    });
+
+    return adjacentCells;
+}
+
+function hasAdjacentBuilding(row, col, buildingType) {
+    const adjacentCells = getAdjacentCells(row, col);
+    return adjacentCells.some(cell => cell.dataset.building === buildingType);
+}
+
+function calculateConnectedRoadScore(row, col) {
+    let score = 0;
+    const rowCells = Array.from(document.querySelectorAll(`.cell[data-row="${row}"]`));
+    const connectedRoads = rowCells.filter(cell => cell.dataset.building === 'Road');
+    score = connectedRoads.length;
+    return score;
+}
+
+function updateProfitAndUpkeep(building) {
+    if (building === 'Residential') {
+        currentProfit += 1;
+        // Check for adjacent Residential buildings to calculate upkeep
+        const row = parseInt(selectedCell.dataset.row);
+        const col = parseInt(selectedCell.dataset.col);
+        if (hasAdjacentBuilding(row, col, 'Residential')) {
+            currentUpkeep += 1;
+        }
+    } else if (building === 'Industry') {
+        currentProfit += 2;
+        currentUpkeep += 1;
+    } else if (building === 'Commercial') {
+        currentProfit += 3;
+        currentUpkeep += 2;
+    } else if (building === 'Park') {
+        currentUpkeep += 1;
+    } else if (building === 'Road') {
+        const row = parseInt(selectedCell.dataset.row);
+        const col = parseInt(selectedCell.dataset.col);
+        if (!hasAdjacentBuilding(row, col, 'Road')) {
+            currentUpkeep += 1;
+        }
+    }
+}
+
+// Demolish a building
+function demolishBuilding() {
+    if (!selectedCell) {
+        alert('Please select a cell first.');
+        return;
+    }
+    if (selectedCell.innerHTML !== '') {
+        const building = selectedCell.dataset.building;
+        selectedCell.innerHTML = '';
+        selectedCell.dataset.building = '';
+        selectedCell.classList.remove('selected');
+        selectedCell = null;
+        turnNumber++;
+        coinsLeft++;
+        currentScore -= 5; // Example penalty for demolishing a building
+        if (gameMode === 'freeplay') {
+            if (building === 'Residential') {
+                currentProfit -= 1;
+                currentUpkeep -= 1;
+            } else if (building === 'Industry') {
+                currentProfit -= 2;
+                currentUpkeep -= 1;
+            } else if (building === 'Commercial') {
+                currentProfit -= 3;
+                currentUpkeep -= 2;
+            } else if (building === 'Park') {
+                currentUpkeep -= 1;
+            } else if (building === 'Road') {
+                currentUpkeep -= 1;
+            }
+        }
+        updateGameInfo();
+    } else {
+        alert('No building to demolish!');
     }
 }
 
 // Placeholder functions for other menu options
-function demolishBuilding() {
-    alert('Demolish Building option selected');
-}
-
 function saveGame() {
     alert('Save Game option selected');
 }
@@ -144,6 +292,10 @@ function exitToMainMenu() {
     document.getElementById('main-menu').style.display = 'block';
 }
 
+function exitGame() {
+    window.close();
+}
+
 // Add a button to toggle dark mode
 const darkModeToggle = document.createElement('button');
 darkModeToggle.id = 'dark-mode-toggle';
@@ -152,37 +304,4 @@ document.body.appendChild(darkModeToggle);
 
 darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-});
-
-// Handle feedback form popup
-const feedbackButton = document.getElementById('feedback-button');
-const feedbackPopup = document.getElementById('feedback-popup');
-const feedbackClose = document.getElementById('feedback-close');
-
-feedbackButton.addEventListener('click', () => {
-    feedbackPopup.classList.toggle('hidden');
-});
-
-feedbackClose.addEventListener('click', () => {
-    feedbackPopup.classList.add('hidden');
-});
-
-// Handle feedback form submission
-document.getElementById('feedback-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const feedbackText = document.getElementById('feedback-text').value;
-
-    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
-        feedback: feedbackText
-    })
-    .then(response => {
-        console.log('Feedback sent successfully:', response.status, response.text);
-        alert('Thank you for your feedback!');
-        document.getElementById('feedback-form').reset();
-        feedbackPopup.classList.add('hidden');
-    })
-    .catch(error => {
-        console.error('Error sending feedback:', error);
-        alert('There was an error submitting your feedback. Please try again later.');
-    });
 });

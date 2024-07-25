@@ -5,15 +5,18 @@ body {
     background-color: #f0f0f0;
     text-align: center;
 }
+
 body.dark-mode {
     background-color: #121212;
     color: #ffffff;
 }
+
 header {
     background-color: #333;
     color: white;
     padding: 10px;
 }
+
 .container {
     max-width: 800px;
     margin: 20px auto;
@@ -22,6 +25,7 @@ header {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 .menu-button {
     display: inline-block;
     background-color: #4CAF50;
@@ -32,12 +36,14 @@ header {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .game-board {
     display: grid;
     gap: 1px;
     margin-top: 20px;
-    justify-content: center; /* Center the game board */
+    justify-content: center;
 }
+
 .cell {
     width: 30px;
     height: 30px;
@@ -45,19 +51,24 @@ header {
     border: 1px solid #aaa;
     cursor: pointer;
 }
+
 .dark-mode .cell {
-    border: 1px solid #ffffff; /* Make the border white for better visibility */
+    border: 1px solid #ffffff;
 }
+
 .cell img {
     width: 100%;
     height: 100%;
 }
+
 .selected {
     outline: 2px solid red;
 }
+
 .hidden {
     display: none;
 }
+
 #building-choice-container {
     position: fixed;
     top: 50%;
@@ -69,24 +80,27 @@ header {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     text-align: center;
 }
+
 #building-choice-container .menu-button {
     display: block;
     margin: 10px auto;
 }
+
 .dark-mode #game-board {
     background-color: #1e1e1e;
 }
+
 .dark-mode #main-menu,
 .dark-mode #game-container {
     background-color: #1e1e1e;
     color: #ffffff;
 }
+
 .dark-mode button {
     background-color: #333333;
     color: #ffffff;
 }
 
-/* Dark Mode Toggle Button */
 #dark-mode-toggle {
     position: fixed;
     bottom: 20px;
@@ -116,7 +130,6 @@ body.dark-mode #dark-mode-toggle .fa-moon {
     display: none;
 }
 
-/* Feedback Button */
 #feedback-button {
     position: fixed;
     bottom: 20px;
@@ -130,7 +143,6 @@ body.dark-mode #dark-mode-toggle .fa-moon {
     font-size: 16px;
 }
 
-/* Feedback Form Popup */
 .feedback-popup {
     display: none;
     position: fixed;

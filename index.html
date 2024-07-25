@@ -6,12 +6,6 @@
     <title>City Building Game</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-    <script>
-        (function() {
-            emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS user ID
-        })();
-    </script>
 </head>
 <body>
     <header>
@@ -23,7 +17,7 @@
         <div class="menu-button" onclick="startNewFreePlayGame()">Start New Free Play Game</div>
         <div class="menu-button" onclick="loadSavedGame()">Load Saved Game</div>
         <div class="menu-button" onclick="displayHighScores()">Display High Scores</div>
-        <div class="menu-button" onclick="exitToMainMenu()">Exit Game</div>
+        <div class="menu-button" onclick="exitGame()">Exit Game</div>
     </div>
 
     <div class="container" id="game-container" style="display: none;">
@@ -35,9 +29,7 @@
             <p id="profit-display" style="display: none;">Current Profit: <span id="current-profit">0</span></p>
             <p id="upkeep-display" style="display: none;">Current Upkeep: <span id="current-upkeep">0</span></p>
         </div>
-        <div class="game-board" id="game-board">
-            <!-- Game board cells will be generated here -->
-        </div>
+        <div class="game-board" id="game-board"></div>
         <div>
             <div class="menu-button" onclick="buildBuilding()">Build a Building</div>
             <div class="menu-button" onclick="demolishBuilding()">Demolish a Building</div>
@@ -56,21 +48,6 @@
     <button id="dark-mode-toggle" class="dark-mode-toggle">
         <i class="fas fa-moon"></i><i class="fas fa-sun"></i>
     </button>
-
-    <!-- Feedback Button -->
-    <button id="feedback-button" class="feedback-button">Feedback</button>
-
-    <!-- Feedback Form Popup -->
-    <div id="feedback-popup" class="feedback-popup hidden">
-        <div class="feedback-popup-content">
-            <span id="feedback-close" class="feedback-close">&times;</span>
-            <h2>Feedback</h2>
-            <form id="feedback-form">
-                <textarea id="feedback-text" rows="4" cols="50" placeholder="Enter your feedback here..."></textarea><br>
-                <button type="submit" class="menu-button">Submit Feedback</button>
-            </form>
-        </div>
-    </div>
 
     <script src="script.js"></script>
 </body>
