@@ -105,9 +105,6 @@ function buildBuilding() {
 document.getElementById('building-choice-1').addEventListener('click', () => selectBuilding(1));
 document.getElementById('building-choice-2').addEventListener('click', () => selectBuilding(2));
 
-document.getElementById('building-choice-1').addEventListener('click', () => selectBuilding(1));
-document.getElementById('building-choice-2').addEventListener('click', () => selectBuilding(2));
-
 function selectBuilding(choice) {
     const building = choice === 1 ? building1 : building2;
     if (selectedCell) {
@@ -274,13 +271,75 @@ function demolishBuilding() {
     }
 }
 
-// Placeholder functions for other menu options
+// Save the game state to localStorage
 function saveGame() {
-    alert('Save Game option selected');
+    const gameState = {
+        turnNumber: turnNumber,
+        coinsLeft: coinsLeft,
+        currentScore: currentScore,
+        currentProfit: currentProfit,
+        currentUpkeep: currentUpkeep,
+        boardSize: boardSize,
+        gameMode: gameMode,
+        boardState: getBoardState()
+    };
+    console.log("Saving game state:", gameState);
+    localStorage.setItem('cityBuildingGameState', JSON.stringify(gameState));
+    const savedState = localStorage.getItem('cityBuildingGameState');
+    console.log("Saved state in localStorage:", savedState);
+    alert('Game saved successfully');
 }
 
+// Load the game state from localStorage
 function loadSavedGame() {
-    alert('Load Saved Game option selected');
+    const savedState = localStorage.getItem('cityBuildingGameState');
+    console.log("Loaded state from localStorage:", savedState);
+    if (savedState) {
+        const gameState = JSON.parse(savedState);
+        console.log("Parsed game state:", gameState);
+        turnNumber = gameState.turnNumber;
+        coinsLeft = gameState.coinsLeft;
+        currentScore = gameState.currentScore;
+        currentProfit = gameState.currentProfit;
+        currentUpkeep = gameState.currentUpkeep;
+        boardSize = gameState.boardSize;
+        gameMode = gameState.gameMode;
+        restoreBoardState(gameState.boardState);
+        updateGameInfo();
+        document.getElementById('game-container').style.display = 'block';
+        document.getElementById('main-menu').style.display = 'none';
+        alert('Game loaded successfully');
+    } else {
+        alert('No saved game found');
+    }
+}
+
+// Get the current state of the game board
+function getBoardState() {
+    const boardState = [];
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        const building = cell.dataset.building;
+        boardState.push({
+            row: parseInt(cell.dataset.row),
+            col: parseInt(cell.dataset.col),
+            building: building
+        });
+    });
+    return boardState;
+}
+
+// Restore the game board from saved state
+function restoreBoardState(boardState) {
+    console.log("Restoring board state:", boardState);
+    initGameBoard(boardSize);
+    boardState.forEach(state => {
+        const cell = document.querySelector(`.cell[data-row="${state.row}"][data-col="${state.col}"]`);
+        if (cell && state.building) {
+            cell.dataset.building = state.building;
+            cell.innerHTML = `<img src="assets/${state.building}.jpg" alt="${state.building}">`;
+        }
+    });
 }
 
 function displayHighScores() {
