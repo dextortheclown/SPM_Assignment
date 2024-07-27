@@ -42,7 +42,9 @@ function startNewArcadeGame() {
     boardSize = arcadeBoardSize;
     updateGameInfo();
     initGameBoard(boardSize);
+    console.log("Arcade game started"); // Log that the game has started
 }
+
 
 // Start a new Free Play game
 function startNewFreePlayGame() {
@@ -90,6 +92,7 @@ function buildBuilding() {
     }
     if (coinsLeft <= 0) {
         alert('No more coins left!');
+        endGame(); // Trigger end game if no coins are left
         return;
     }
     const buildings = ['Residential', 'Industry', 'Commercial', 'Park', 'Road'];
@@ -127,6 +130,12 @@ function selectBuilding(choice) {
         }
         updateGameInfo();
         document.getElementById('building-choice-container').classList.add('hidden'); // Hide the popup
+
+        // Check coins after building placement
+        if (coinsLeft <= 0) {
+            alert('No more coins left! Ending game.');
+            endGame(); // Trigger end game if no coins are left after building
+        }
     }
 }
 
@@ -351,9 +360,53 @@ function exitToMainMenu() {
     document.getElementById('main-menu').style.display = 'block';
 }
 
-function exitGame() {
-    window.close();
+function displayHighScores() {
+    const APIKEY = '66a4b1c52212c708cd8e9199';
+    const apiUrl = 'https://spmasg-82df.restdb.io/rest/scores';
+
+    console.log("Fetching high scores from:", apiUrl);
+
+    fetch(apiUrl, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-apikey': APIKEY
+        }
+    })
+    .then(response => {
+        console.log("API Response:", response);
+        return response.json();
+    })
+    .then(data => {
+        console.log("High Scores Data:", data);
+        updateHighScoresTable(data);
+    })
+    .catch(error => {
+        console.error('Error fetching high scores:', error);
+        alert("Failed to fetch high scores.");
+    });
+
+    // Make the high scores container visible
+    document.getElementById('high-scores-container').style.display = 'block';
 }
+
+function updateHighScoresTable(scores) {
+    const tableBody = document.getElementById('high-scores-table').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = ''; // Clear existing rows
+
+    console.log("Updating table with scores:", scores);
+
+    scores.forEach(score => {
+        const row = tableBody.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        const cell3 = row.insertCell(2);
+
+        cell1.textContent = score.name || "No name";  // Handle possible undefined names
+        cell2.textContent = score.score;
+        cell3.textContent = score.createdAt ? new Date(score.createdAt).toLocaleDateString("en-US") : "No date";  // Handle possible undefined dates
+    });
+}
+
 
 // Add a button to toggle dark mode
 const darkModeToggle = document.createElement('button');
@@ -364,3 +417,55 @@ document.body.appendChild(darkModeToggle);
 darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
 });
+
+// Function to end the game and handle score saving
+function endGame() {
+    // Prompt for player's name at the end of the game
+    const playerName = prompt("Game Over! Enter your name to save your score:");
+    if (playerName) {
+        sendPointsToAPI(currentScore, playerName);
+    } else {
+        alert("Score not saved. No name provided.");
+    }
+}
+
+// Function to send score and player name to the API
+function sendPointsToAPI(score, playerName) {
+    // Get current date and time in ISO format
+    const now = new Date().toISOString();
+
+    // Prepare the data object with score, player name, and the current timestamp
+    const data = {
+        name: playerName,
+        score: score,
+        createdAt: now
+    };
+
+    const APIKEY = '66a4b1c52212c708cd8e9199';
+    const apiUrl = 'https://spmasg-82df.restdb.io/rest/scores';
+
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-apikey': APIKEY,
+            'Cache-Control': 'no-cache',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Score saved:', data);
+        alert("Thank you, " + playerName + "! Your score has been saved.");
+        fetchHighestScoreAndUpdateDisplay(); // Optional: Fetch and display the highest score
+    })
+    .catch(error => {
+        console.error('Error saving score:', error);
+        alert("Failed to save score. Please try again later.");
+    });
+}

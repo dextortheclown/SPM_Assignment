@@ -186,3 +186,17 @@ body.dark-mode #dark-mode-toggle .fa-moon {
     border-radius: 5px;
     cursor: pointer;
 }
+
+#high-scores-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#high-scores-table, #high-scores-table th, #high-scores-table td {
+    border: 1px solid black;
+}
+
+#high-scores-table th, #high-scores-table td {
+    padding: 8px;
+    text-align: left;
+}
