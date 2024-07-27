@@ -32,6 +32,8 @@ function initGameBoard(size) {
 
 // Start a new Arcade game
 function startNewArcadeGame() {
+    document.getElementById('high-scores-container').style.display = 'none';
+
     gameMode = 'arcade';
     document.getElementById('game-mode').textContent = 'Arcade Mode';
     document.getElementById('main-menu').style.display = 'none';
@@ -48,6 +50,8 @@ function startNewArcadeGame() {
 
 // Start a new Free Play game
 function startNewFreePlayGame() {
+    document.getElementById('high-scores-container').style.display = 'none';
+
     gameMode = 'freeplay';
     document.getElementById('game-mode').textContent = 'Free Play Mode';
     document.getElementById('main-menu').style.display = 'none';
@@ -301,6 +305,7 @@ function saveGame() {
 
 // Load the game state from localStorage
 function loadSavedGame() {
+    document.getElementById('high-scores-container').style.display = 'none'; // Hide high scores
     const savedState = localStorage.getItem('cityBuildingGameState');
     console.log("Loaded state from localStorage:", savedState);
     if (savedState) {
@@ -319,9 +324,10 @@ function loadSavedGame() {
         document.getElementById('main-menu').style.display = 'none';
         alert('Game loaded successfully');
     } else {
-        alert('No saved game found');
+        alert('No saved game available. Start a new game or check your local storage settings.');
     }
 }
+
 
 // Get the current state of the game board
 function getBoardState() {
